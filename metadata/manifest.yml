@@ -13,7 +13,6 @@ Categories:
 - service
 - javascript
 - nodejs
-- web_framework
 Help-Topics:
   Node.js Manual & Documentation: http://nodejs.org/api/
 Provides:
@@ -35,19 +34,7 @@ Subscribes:
 Endpoints:
 - Private-IP-Name: IP
   Private-Port-Name: PORT
-  Private-Port: 8080
+  Private-Port: 3000
   Public-Port-Name: PROXY_PORT
   Protocols:
   - http
-  - ws
-  Options:
-    primary: true
-  Mappings:
-  - Frontend: ''
-    Backend: ''
-    Options:
-      websocket: true
-  - Frontend: /health
-    Backend: /health
-    Options:
-      health: true
