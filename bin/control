@@ -108,7 +108,7 @@ function tidy() {
 case ${1} in
   pre-repo-archive) pre-repo-archive ;;
   build)            build            ;;
-  start)            build&start      ;;
+  start)            build && start   ;;
   stop)             stop             ;;
   restart)          restart          ;;
   status)           status           ;;

@@ -2,7 +2,10 @@
 
 ![nodejs-openshift](https://cloud.githubusercontent.com/assets/581999/12095822/1323a858-b31a-11e5-9ce7-aa47695f10d0.png)
 
-This is a custom Node.js cartridge that **takes care of auto-updating the Node.js and NPM versions** on each build.
+# Forked from
+    https://github.com/icflorescu/openshift-cartridge-nodejs
+
+This is a custom Node.js cartridge that **takes care of auto-updating the Node.js and NPM versions** on each start.
 
 By default, the Node.js version is determined by querying [semver.io/node/stable](https://semver.io/node/stable).
 
@@ -14,37 +17,41 @@ A different URL can be specified in your application's repository, in the `.open
 
 Because the standard OpenShift cartridge never gets updated to the latest Node.js version.
 
+The original cartridge by icflorescu is designed as a primary cartridge. Therefore you have to use an additional gear for it. In my case I want to use Node.js as a small background worker which would lead to a waste of my free gears.
+
+This cartridge add the current Node.js version as a secondary server.
+
 ## When to use
 
 When you need a quick and unsofisticated solution to run your application on the latest Node.js version.
 
 ## How to ([web console](https://openshift.redhat.com/app/console/applications))
 
-Go to [Choose a type of application](https://openshift.redhat.com/app/console/application_types) in your OpenShift Online account, paste the URL below into "Code Anything" textbox at the bottom of the page, click "Next", then set your public URL and click "Create Application".
+To install this cartridge in your existing OpenShift application, go to **"See the list of cartridges you can add"**, paste the URL below in **"Install your own cartridge"** textbox at the bottom of the page and click "Next".
 
-    http://cartreflect-claytondev.rhcloud.com/github/icflorescu/openshift-cartridge-nodejs
+    http://cartreflect-claytondev.rhcloud.com/github/Rawi01/openshift-cartridge-nodejs
 
 ## How to (command line)
 
 Assuming you have `rhc` installed (see [here](https://developers.openshift.com/en/managing-client-tools.html)), run:
 
-    rhc app create -t http://cartreflect-claytondev.rhcloud.com/github/icflorescu/openshift-cartridge-nodejs -a appname
+    rhc cartridge add -t http://cartreflect-claytondev.rhcloud.com/github/Rawi01/openshift-cartridge-nodejs -a appname
 
 ...where `appname` is the name of your application.
 
-See output of `rhc app create --help` for information on additional options.
+See output of `rhc cartridge add --help` for information on additional options.
 
 ## Features
 
-- The cartridge [build script](https://github.com/icflorescu/openshift-cartridge-nodejs/blob/master/bin/control#L11) is using [this function](https://github.com/icflorescu/openshift-cartridge-nodejs/blob/master/lib/util#L3) to check for the latest Node.js and npm versions and installs them if necessary;
+- The cartridge [build script](https://github.com/Rawi01/openshift-cartridge-nodejs/blob/master/bin/control#L11) is using [this function](https://github.com/Rawi01/openshift-cartridge-nodejs/blob/master/lib/util#L3) to check for the latest Node.js and npm versions and installs them if necessary;
 - This cartridge **can** be scaled;
 - This cartridge **does not** (yet?) have a hot-deploy strategy.
 
 ## Notes
 
 - Can't guarantee this cartridge is production-ready. Some people use it though (on **their own responsibility**).
-- This is a lean cartridge. No unnecessary modules are installed. Which means that - unlike the standard Node.js cartridge - it won't install [supervisor](https://github.com/isaacs/node-supervisor) for you. You'll have to implement your own logic to auto-restart on errors. The [provided application template](https://github.com/icflorescu/openshift-cartridge-nodejs/blob/master/usr/template/start.js) is using [cluster](http://nodejs.org/api/cluster.html) for that.
-- The cartridge emulates the execution of `npm start` to start your application, so **make sure your application entrypoint is defined in your start script of your `package.json` file**. See [`package.json` in the provided template](https://github.com/icflorescu/openshift-cartridge-nodejs/blob/master/usr/template/package.json) or read the [`npm` docs](https://docs.npmjs.com/cli/start) for more information.
+- This is a lean cartridge. No unnecessary modules are installed. Which means that - unlike the standard Node.js cartridge - it won't install [supervisor](https://github.com/isaacs/node-supervisor) for you. You'll have to implement your own logic to auto-restart on errors. The [provided application template](https://github.com/Rawi01/openshift-cartridge-nodejs/blob/master/usr/template/start.js) is using [cluster](http://nodejs.org/api/cluster.html) for that.
+- The cartridge emulates the execution of `npm start` to start your application, so **make sure your application entrypoint is defined in your start script of your `package.json` file**. See [`package.json` in the provided template](https://github.com/Rawi01/openshift-cartridge-nodejs/blob/master/usr/template/package.json) or read the [`npm` docs](https://docs.npmjs.com/cli/start) for more information.
 - Due to OpenShift's outdated gcc (**4.4.7** as of Jan 4 2016), **native modules (such as [pg-native](https://github.com/brianc/node-pg-native)) won't compile on Node.js > 4.x. They'll only work on Node.js 0.10 and 0.12**. See [this issue](https://github.com/icflorescu/openshift-cartridge-nodejs/issues/12) for more info.
 - Upon cartridge initialization, the Node.js binary package is downloaded and installed, which **may take a while**, depending on OpenShift server and network load. 2 - 3 minutes is quite often, but 5 - 10 minutes is not uncommon, especially for scalable multi-gear setups (if you specified "Scale with web traffic").
 
@@ -52,8 +59,8 @@ See output of `rhc app create --help` for information on additional options.
 
 **Q**: I'm getting the error *Cannot download, must be smaller than 20480 bytes* while trying to deploy the cartridge to OpenShift. What am I doing wrong?
 
-**A**: You're probably trying to use the URL `https://github.com/icflorescu/openshift-cartridge-nodejs` instead of
-`http://cartreflect-claytondev.rhcloud.com/github/icflorescu/openshift-cartridge-nodejs`. A common mistake for people not paying sufficient attention while trying to use a custom cartridge for the first time.
+**A**: You're probably trying to use the URL `https://github.com/Rawi01/openshift-cartridge-nodejs` instead of
+`http://cartreflect-claytondev.rhcloud.com/github/Rawi01/openshift-cartridge-nodejs`. A common mistake for people not paying sufficient attention while trying to use a custom cartridge for the first time.
 
 ---
 
@@ -87,8 +94,8 @@ Since you're here, chances are you might also be interested in this [custom Mong
 
 See contributors [here](https://github.com/icflorescu/openshift-cartridge-nodejs/graphs/contributors).
 
-If you find this repo useful, don't hesitate to give it a star and [spread the word](http://twitter.com/share?text=Checkout%20this%20custom%20Node.js%20cartridge%20for%20OpenShift!&amp;url=http%3A%2F%2Fgithub.com/icflorescu/openshift-cartridge-nodejs&amp;hashtags=javascript,nodejs,openshift&amp;via=icflorescu).
+If you find this repo useful, don't hesitate to give it a star and [spread the word](http://twitter.com/share?text=Checkout%20this%20custom%20Node.js%20cartridge%20for%20OpenShift!&amp;url=http%3A%2F%2Fgithub.com/Rawi01/openshift-cartridge-nodejs&amp;hashtags=javascript,nodejs,openshift&amp;via=Rawi01).
 
 ## License
 
-The [MIT License](https://github.com/icflorescu/openshift-cartridge-nodejs/blob/master/LICENSE).
+The [MIT License](https://github.com/Rawi01/openshift-cartridge-nodejs/blob/master/LICENSE).
