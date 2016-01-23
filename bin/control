@@ -28,7 +28,9 @@ function pre-repo-archive() {
 }
 
 function build() {
+  client_message 'Check for updates...'
   update_nodejs
+  client_message 'Installing modules...'
   local INIT_DIR=`pwd`
   cd ${SOURCE_DIR}
   if [ -d ${TMP}node_modules ]; then
@@ -106,7 +108,7 @@ function tidy() {
 case ${1} in
   pre-repo-archive) pre-repo-archive ;;
   build)            build            ;;
-  start)            start            ;;
+  start)            start&build      ;;
   stop)             stop             ;;
   restart)          restart          ;;
   status)           status           ;;
