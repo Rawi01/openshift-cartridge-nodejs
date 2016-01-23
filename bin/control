@@ -3,8 +3,16 @@
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 source $HOME/nodejs/lib/util
 
-START_COMMAND=$(node -e "var p = require('$OPENSHIFT_REPO_DIR/package.json'); console.log(p.scripts.start);")
-
+if [ -f "$OPENSHIFT_REPO_DIR/.openshift/SOURCE_DIR" ]; then
+  SOURCE_DIR=${OPENSHIFT_REPO_DIR}${cat OPENSHIFT_REPO_DIR/.openshift/SOURCE_DIR}
+else
+  SOURCE_DIR=${OPENSHIFT_REPO_DIR}
+fi
+if [ -f "$SOURCE_DIR/package.json" ]; then
+  START_COMMAND=$(node -e "var p = require('$SOURCE_DIR/package.json'); console.log(p.scripts.start);")
+else
+  START_COMMAND="supervisor server.js"
+fi
 function is_running() {
   if [ ! -z "$(ps -ef | grep "$START_COMMAND" | grep -v grep)" ]; then
     return 0
@@ -14,15 +22,15 @@ function is_running() {
 }
 
 function pre-repo-archive() {
-  if [ -d ${OPENSHIFT_REPO_DIR}node_modules ]; then
-    mv -f ${OPENSHIFT_REPO_DIR}node_modules ${TMP}
+  if [ -d ${SOURCE_DIR}node_modules ]; then
+    mv -f ${SOURCE_DIR}node_modules ${TMP}
   fi
 }
 
 function build() {
   update_nodejs
   local INIT_DIR=`pwd`
-  cd ${OPENSHIFT_REPO_DIR}
+  cd ${SOURCE_DIR}
   if [ -d ${TMP}node_modules ]; then
     mv -f ${TMP}node_modules ./
   fi
@@ -38,7 +46,7 @@ function start() {
   else
     client_message 'Starting Node.js application...'
     local INIT_DIR=`pwd`
-    cd ${OPENSHIFT_REPO_DIR}
+    cd ${SOURCE_DIR}
     nohup ${START_COMMAND} |& /usr/bin/logshifter -tag nodejs &
     cd ${INIT_DIR}
     i=0
